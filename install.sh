@@ -59,12 +59,17 @@ for pkg in curl ip iostat; do
     fi
 done
 
-# --- 3. Create install directory ---
+# --- 3. Stop and kill any existing daemon ---
+echo "==> Stopping any existing resource monitor daemon..."
+systemctl stop resource-monitor-daemon 2>/dev/null || true
+pkill -f resource_monitor_daemon.sh 2>/dev/null || true
+
+# --- 4. Create install directory ---
 echo "==> Creating $INSTALL_DIR..."
 mkdir -p "$INSTALL_DIR"
 chown -R "$SUDO_USER:$SUDO_USER" "$INSTALL_DIR"
 
-# --- 4. Download cron script ---
+# --- 5. Download cron script ---
 echo "==> Downloading resource_monitor.sh (cron)..."
 wget -q -O "$CRON_SCRIPT_PATH" "$CRON_SCRIPT_URL"
 if [ ! -s "$CRON_SCRIPT_PATH" ]; then
