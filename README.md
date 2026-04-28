@@ -103,6 +103,59 @@ Runs as a systemd service, sampling CPU every 5 seconds to catch short-lived spi
 
 ---
 
+## Testing High CPU Usage
+
+To verify that the daemon detects CPU spikes and reports them correctly, you can artificially spike CPU usage using the `yes` command.
+
+### Spike CPU on a single core
+
+```bash
+yes > /dev/null &
+```
+
+`yes` outputs an endless stream of `y` characters, consuming 100% of one CPU core. Running it in the background (`&`) lets you keep using the terminal.
+
+### Spike multiple cores
+
+Run one instance per core you want to saturate:
+
+```bash
+yes > /dev/null &
+yes > /dev/null &
+yes > /dev/null &
+yes > /dev/null &
+```
+
+Or use a loop:
+
+```bash
+for i in $(seq 1 $(nproc)); do yes > /dev/null & done
+```
+
+This saturates all cores. Within 5 seconds the daemon will detect the spike and send the top processes to Monitoring Zone.
+
+### Stop the CPU spike
+
+```bash
+killall yes
+```
+
+`killall` sends `SIGTERM` to every process named `yes`, stopping all instances at once. CPU drops back to normal immediately.
+
+### Verify it was detected
+
+```bash
+journalctl -t resource-monitor-daemon -f
+```
+
+You should see log lines like:
+
+```
+CPU spike: 98.00% >= 80% — capturing top processes
+```
+
+---
+
 ## Useful Commands
 
 ```bash
