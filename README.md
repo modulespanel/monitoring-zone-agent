@@ -103,6 +103,52 @@ Runs as a systemd service, sampling CPU every 5 seconds to catch short-lived spi
 
 ---
 
+## Ensuring the Daemon is Running
+
+After installation, verify the daemon is active:
+
+```bash
+systemctl status resource-monitor-daemon
+```
+
+You should see `Active: active (running)`. If not:
+
+```bash
+# Start it
+systemctl start resource-monitor-daemon
+
+# Check for errors
+journalctl -u resource-monitor-daemon -n 50
+```
+
+### Make sure it starts on reboot
+
+The installer enables the service automatically, but you can confirm:
+
+```bash
+systemctl is-enabled resource-monitor-daemon
+```
+
+Should output `enabled`. If not:
+
+```bash
+systemctl enable resource-monitor-daemon
+```
+
+### Quick health check
+
+```bash
+journalctl -t resource-monitor-daemon -n 10
+```
+
+You should see log lines every 5 seconds. If the last entry is older than that, the daemon has stalled — restart it:
+
+```bash
+systemctl restart resource-monitor-daemon
+```
+
+---
+
 ## Testing High CPU Usage
 
 To verify that the daemon detects CPU spikes and reports them correctly, you can artificially spike CPU usage using the `yes` command.
