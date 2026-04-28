@@ -111,7 +111,16 @@ After installation, verify the daemon is active:
 systemctl status resource-monitor-daemon
 ```
 
-You should see `Active: active (running)`. If not:
+You should see `Active: active (running)` with output similar to:
+
+```
+● resource-monitor-daemon.service - Resource Monitor CPU Daemon
+     Active: active (running)
+    ├─ 692 /bin/bash /resource_monitor/resource_monitor_daemon.sh <monitor-uuid>
+    └─ 1392464 sleep 5
+```
+
+The `sleep 5` child process is normal — it means the daemon completed a cycle and is waiting before the next one. If not running:
 
 ```bash
 # Start it
