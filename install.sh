@@ -71,7 +71,11 @@ chown -R "$SUDO_USER:$SUDO_USER" "$INSTALL_DIR"
 
 # --- 5. Download cron script ---
 echo "==> Downloading resource_monitor.sh (cron)..."
-wget -q -O "$CRON_SCRIPT_PATH" "$CRON_SCRIPT_URL"
+WGET_OPTS="-q"
+if ! curl -6 -s --max-time 3 -o /dev/null https://ipv6.google.com 2>/dev/null; then
+    WGET_OPTS="-q -4"
+fi
+wget $WGET_OPTS -O "$CRON_SCRIPT_PATH" "$CRON_SCRIPT_URL"
 if [ ! -s "$CRON_SCRIPT_PATH" ]; then
     echo "Failed to download resource_monitor.sh. Exiting..."
     exit 1
@@ -84,7 +88,7 @@ echo "resource_monitor.sh ready."
 
 # --- 5. Download daemon script ---
 echo "==> Downloading resource_monitor_daemon.sh (daemon)..."
-wget -q -O "$DAEMON_SCRIPT_PATH" "$DAEMON_SCRIPT_URL"
+wget $WGET_OPTS -O "$DAEMON_SCRIPT_PATH" "$DAEMON_SCRIPT_URL"
 if [ ! -s "$DAEMON_SCRIPT_PATH" ]; then
     echo "Failed to download resource_monitor_daemon.sh. Exiting..."
     exit 1
